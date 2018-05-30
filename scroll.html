@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="angular.min.js"></script>
+    <script src="infinite-scroll.js"></script>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <style>
+    div,ul{
+    margin:0;
+    padding:0;
+    }
+ 
+    .container ul li{
+    width: 100%;
+    height: 3rem;
+    border-bottom: 1px solid #DCDCDC;
+    list-style:none;
+    margin:0;
+    }
+    </style>
+ 
+</head>
+<body>
+    <div  ng-app="app" ng-controller="ctrl" class="container">
+            <ul   infinite-scroll='loadMore()' infinite-scroll-distance='0' infinite-scroll-disabled="busy">
+                <li ng-repeat="obj in items">
+                    {{obj.name}} 
+                </li>
+            </ul>
+    </div>
+    <script>
+        var app = angular.module("app", ['infinite-scroll']);
+            app.config(['$locationProvider', function ($locationProvider) {
+                // $locationProvider.html5Mode(true);
+                $locationProvider.html5Mode({
+                    enabled: true,
+                    requireBase: false
+                });
+            }]);
+            app.controller('ctrl', function ($scope, $location, $http) {
+                // 当前页数
+                $scope.currentPage = 0;
+                // 总页数
+                $scope.totalPages = 100000;
+                // 防止重复加载
+                $scope.busy = false;
+                // 存放数据
+                $scope.items = [];
+                // 请求数据方法
+                $scope.loadMore = function () {
+                    if ($scope.currentPage < $scope.totalPages) {
+                        console.log($scope.currentPage)
+                        console.log($scope.totalPages)
+                        $scope.currentPage++;
+                        if ($scope.busy) {
+                            return false;
+                        }
+                        $scope.busy = true;
+                       //$http({
+                        //    method: 'GET',
+                        //    url: 'url',
+                        //    params: {
+                        //        id: $location.search().id,
+                        //        pageIndex: $scope.currentPage,
+                        //        pageSize: 12
+                        //    }
+                        //}).then(function successCallback(response) {
+                        //    var data = response.data;
+                        //    $scope.busy = false;
+                        //    for (var i in data.list) {
+                        //        $scope.items.push(data.list[i]);
+                        //    }
+                        //    $scope.totalPages = data.totalPages;
+
+                        //});
+                        var response = getList();
+                        var data = response.data;
+                        $scope.busy = false;          
+                        for (var i in data.list) {
+                            $scope.items.push(data.list[i]);
+                        }
+                        $scope.totalPages = data.totalPages;
+                    };
+                }
+                $scope.loadMore();
+                
+            });
+
+            function getList()
+            {
+                var obj = {};
+                var arr = [{ name: "滑动1" }, { name: "滑动2" }, { name: "滑动3" }, { name: "滑动4" }, { name: "滑动5" }, { name: "滑动6" }, { name: "滑动7" }, { name: "滑动8" }, { name: "滑动9" }, { name: "滑动10" }, { name: "滑动11" }, { name: "滑动12" }, { name: "滑动13" }, , { name: "滑动14" }, , { name: "滑动15" }, , { name: "滑动16" }]
+                obj.list = arr;
+                obj.totalPages = 1000000;
+                var response = {};
+                response.data = obj;
+                return response;
+            }
+
+    </script>
+</body>
+</html>
